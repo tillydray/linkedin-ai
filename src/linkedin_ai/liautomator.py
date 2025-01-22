@@ -367,24 +367,27 @@ class LinkedInAutomator:
                 "data-view-name": "job-card",
             },
         ):
+
             job_id = job_card.attrs["data-job-id"]
             link_elm = job_card.find("a")
-            title = link_elm.text.strip()
+            title = link_elm.text.strip() if link_elm else None
             title = title[: len(title) // 2]
             url = "https://www.linkedin.com/jobs/view/" + job_id + "/"
-            company_name = job_card.find(
-                "span", attrs={"class": "job-card-container__primary-description"}
-            ).text.strip()
-            location = job_card.find("li", attrs={"class": "job-card-container__metadata-item"}).text.strip()
-            if "(" in location:
-                location, workplace_type = location.split("(", 1)
-                location = location.strip()
-                workplace_type = workplace_type.strip(")").strip()
-                remote = workplace_type == "Remote"
-            else:
-                workplace_type = None
-                remote = None
-
+            company_name = job_card.find("span", attrs={"class": "jsdebAlNjIzGplmhZwPjAkZIxSqBWSAbeg"})
+            company_name = company_name.text.strip() if company_name else None
+            location = job_card.find("li", attrs={"class": "job-card-container__metadata-item"})
+            remote = None
+            workplace_type = None
+            if location:
+                location = location.text.strip()
+                if "(" in location:
+                    location, workplace_type = location.split("(", 1)
+                    location = location.strip()
+                    workplace_type = workplace_type.strip(")").strip()
+                    remote = workplace_type == "Remote"
+                else:
+                    workplace_type = None
+                    remote = None
             yield Job(
                 id=job_id,
                 title=title,
